@@ -7,15 +7,25 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Install ncurses
+      run: |
+        mkdir "${{ runner.workspace }}/ncurses"
+        cd "${{ runner.workspace }}/ncurses"
+        git clone https://github.com/mirror/ncurses.git
+        cd ncurses
+        git checkout v6.2
+        ./configure  --with-termlib
+        make -j
+        sudo make install
+
     - name: Install Iceoryx
       run: |
         mkdir "${{ runner.workspace }}/iceoryx"
         cd "${{ runner.workspace }}/iceoryx"
-        git clone https://github.com/mirror/ncurses.git
-        cd ncurses
-        git checkout v6.2
-        ./configure  --prefix=${{ runner.workspace }}/iceoryx/iceoryx/build/dependencies/ --exec-prefix=${{ runner.workspace }}/iceoryx/iceoryx/build/dependencies/ --with-termlib
-        make -j
+        git clone https://github.com/eclipse/iceoryx.git
+        cd iceoryx
+        git checkout release_0.17
+        ./tools/iceoryx_build_test.sh
         sudo mkdir /etc/iceoryx
         sudo cp ${{ runner.workspace }}/iceoryx/iceoryx/iceoryx_posh/etc/iceoryx/roudi_config_example.toml /etc/iceoryx/roudi_config.toml
         cd ${{ runner.workspace }}/iceoryx/iceoryx/build/install/prefix/bin
