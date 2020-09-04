@@ -1,0 +1,22 @@
+name: Build Ubuntu 20.04
+
+on: [push]
+
+jobs:
+  build-ubuntu:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Install Iceoryx
+      run: |
+        sudo apt-get install libacl1-dev libncurses5-dev pkg-config
+        mkdir "${{ runner.workspace }}/iceoryx"
+        cd "${{ runner.workspace }}/iceoryx"
+        git clone https://github.com/eclipse/iceoryx.git
+        cd iceoryx
+        git checkout release_0.17
+        ./tools/iceoryx_build_test.sh
+        sudo mkdir /etc/iceoryx
+        sudo cp ${{ runner.workspace }}/iceoryx/iceoryx/iceoryx_posh/etc/iceoryx/roudi_config_example.toml /etc/iceoryx/roudi_config.toml
+        cd ${{ runner.workspace }}/iceoryx/iceoryx/build/install/prefix/bin
+        ./RouDi &

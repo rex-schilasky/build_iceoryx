@@ -1,0 +1,22 @@
+name: Build macOS Catalina 10.15
+
+on: [push]
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Install Iceoryx
+      run: |
+        mkdir "${{ runner.workspace }}/iceoryx"
+        cd "${{ runner.workspace }}/iceoryx"
+        git clone https://github.com/mirror/ncurses.git
+        cd ncurses
+        git checkout v6.2
+        ./configure  --prefix=${{ runner.workspace }}/iceoryx/iceoryx/build/dependencies/ --exec-prefix=${{ runner.workspace }}/iceoryx/iceoryx/build/dependencies/ --with-termlib
+        make -j
+        sudo mkdir /etc/iceoryx
+        sudo cp ${{ runner.workspace }}/iceoryx/iceoryx/iceoryx_posh/etc/iceoryx/roudi_config_example.toml /etc/iceoryx/roudi_config.toml
+        cd ${{ runner.workspace }}/iceoryx/iceoryx/build/install/prefix/bin
+        ./RouDi &
